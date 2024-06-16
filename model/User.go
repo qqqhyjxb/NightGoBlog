@@ -6,7 +6,10 @@ package model
 
 import (
 	"NightGoBlog/utils/errmsg"
+	"encoding/base64"
+	"golang.org/x/crypto/scrypt"
 	"gorm.io/gorm"
+	"log"
 )
 
 type User struct {
@@ -29,6 +32,9 @@ func CheckUser(username string) (code int) {
 
 // CreateUser 新增用户
 func CreateUser(user *User) int {
+	// 先对密码进行加密，再添加用户
+	user.Password = ScryptPw(user.Password)
+
 	err := db.Create(&user).Error
 	if err != nil {
 		return errmsg.ERROR // 500
@@ -39,10 +45,26 @@ func CreateUser(user *User) int {
 
 // GetUsers GetUser 查询用户列表
 func GetUsers(pageSize int, pageNum int) []User {
+
 	var users []User
 	err := db.Limit(pageSize).Offset((pageNum - 1) * pageSize).Find(&users).Error
 	if err != nil {
 		return nil
 	}
 	return users
+}
+
+// ScryptPw 密码加密
+func ScryptPw(password string) string {
+	const KeyLen = 10
+	salt := make([]byte, 8)
+	salt = []byte{12, 32, 4, 6, 66, 22, 222, 11}
+
+	HashPw, err := scrypt.Key([]byte(password), salt, 16384, 8, 1, KeyLen)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	Fpw := base64.StdEncoding.EncodeToString(HashPw)
+	return Fpw
 }

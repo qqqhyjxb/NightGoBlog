@@ -62,10 +62,31 @@ func GetUsers(c *gin.Context) {
 
 // EditUser 编辑用户
 func EditUser(c *gin.Context) {
-	// todo 编辑
+	var user model.User
+	id, _ := strconv.Atoi(c.Param("id"))
+	_ = c.ShouldBindJSON(&user)
+	code := model.CheckUser(user.Username)
+	if code == errmsg.SUCCSE {
+		model.EditUser(id, &user)
+	}
+	if code == errmsg.ERROR_USERNAME_USED {
+		c.Abort()
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"status":  code,
+		"message": errmsg.GetErrMsg(code),
+	})
 }
 
 // DeleteUser 删除用户
 func DeleteUser(c *gin.Context) {
-	// todo 删除用户
+	id, _ := strconv.Atoi(c.Param("id"))
+
+	code := model.DeleteUser(id)
+
+	c.JSON(http.StatusOK, gin.H{
+		"status":  code,
+		"message": errmsg.GetErrMsg(code),
+	})
 }

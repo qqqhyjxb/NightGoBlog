@@ -33,7 +33,8 @@ func CheckUser(username string) (code int) {
 // CreateUser 新增用户
 func CreateUser(user *User) int {
 	// 先对密码进行加密，再添加用户
-	user.Password = ScryptPw(user.Password)
+	//user.Password = ScryptPw(user.Password)
+	//上述功能改用BeforeSave钩子函数实现自动调用
 
 	err := db.Create(&user).Error
 	if err != nil {
@@ -54,7 +55,36 @@ func GetUsers(pageSize int, pageNum int) []User {
 	return users
 }
 
-// ScryptPw 密码加密
+// EditUser 编辑用户  , 在编辑用户功能中一般不涉及密码的修改，密码修改设计到身份验证应该单独开发一个方法
+func EditUser(id int, user *User) int {
+	var u User
+	var maps = make(map[string]interface{})
+	maps["username"] = user.Username
+	maps["role"] = user.Role
+	err := db.Model(&u).Where("id = ?", id).Updates(maps)
+	if err != nil {
+		return errmsg.ERROR
+	}
+	return errmsg.SUCCSE
+}
+
+// DeleteUser 删除用户
+func DeleteUser(id int) int {
+	var user User
+	// 软删除，数据库中并不会真的删除该数据，而是将该记录的DeleteAt设置为当前时间，而后的一般查询方法将无法查找到此条记录
+	err := db.Where("id = ?", id).Delete(&user).Error
+	if err != nil {
+		return errmsg.ERROR
+	}
+	return errmsg.SUCCSE
+}
+
+// BeforeCreate  ScryptPw 密码加密
+func (u *User) BeforeCreate(tx *gorm.DB) (err error) {
+	u.Password = ScryptPw(u.Password)
+	return
+}
+
 func ScryptPw(password string) string {
 	const KeyLen = 10
 	salt := make([]byte, 8)

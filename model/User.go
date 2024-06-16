@@ -71,6 +71,7 @@ func EditUser(id int, user *User) int {
 // DeleteUser 删除用户
 func DeleteUser(id int) int {
 	var user User
+	// 如果设置了gorm.MODEL
 	// 软删除，数据库中并不会真的删除该数据，而是将该记录的DeleteAt设置为当前时间，而后的一般查询方法将无法查找到此条记录
 	err := db.Where("id = ?", id).Delete(&user).Error
 	if err != nil {

@@ -20,6 +20,7 @@ const (
 	// code = 2000... 文章模块的错误
 
 	// code = 3000... 分类模块的错误
+	ERROR_CATENAME_USED = 2001 //分类已存在
 )
 
 // CodeMsg 声明字典
@@ -33,6 +34,7 @@ var CodeMsg = map[int]string{
 	ERROR_TOKEN_RUNTIME:    "TOKEN已过期",
 	ERROR_TOKEN_WRONG:      "TOKEN不正确",
 	ERROR_TOKEN_TYPE_WRONG: "TOKEN格式错误",
+	ERROR_CATENAME_USED:    "分类已存在",
 }
 
 // GetErrMsg 输出错误信息的方法

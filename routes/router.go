@@ -9,7 +9,10 @@ import (
 
 func InitRouter() {
 	gin.SetMode(utils.AppMode)
-	r := gin.Default()
+	r := gin.New()
+	r.Use(middleware.Logger())
+	r.Use(gin.Recovery())
+
 	//r := gin.New()  该方法比上面的Default少了log和错误恢复功能，建议使用Default
 	auth := r.Group("api/v1")
 	auth.Use(middleware.JwtToken())

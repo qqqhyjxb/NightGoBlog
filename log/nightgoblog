@@ -1,0 +1,1 @@
+time="2024-06-26T00:07:33+08:00" level=info ClientIP="::1" DataSize=102 HostName=BrokenMachine Method=POST Path=/api/v1/upload SpendTime="270 ms" UserAgent="Apifox/1.0.0 (https://apifox.com)" statusCode=200

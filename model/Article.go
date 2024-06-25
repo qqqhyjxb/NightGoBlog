@@ -11,7 +11,7 @@ import (
 )
 
 type Article struct {
-	Category Category `gorm:"foreignkey:Cid"` //声明关联关系，不声明有可能会报错（反正我报错了……）
+	Category Category `gorm:"foreignkey:Cid"` //声明外键关联关系
 	gorm.Model
 	Title   string `gorm:"type:varchar(100);not null " json:"title"`
 	Cid     int    `gorm:"type:int;not null " json:"cid"`
@@ -31,19 +31,40 @@ func CreateArt(data *Article) int {
 
 }
 
-// todo 查询分类下的所有文章
-
-// todo 查询单个文章
-
-// todo 查询文章列表
-func GetArt(pageSize int, pageNum int) []Category {
-
-	var cate []Category
-	err := db.Limit(pageSize).Offset((pageNum - 1) * pageSize).Find(&cate).Error
+// GetCateArt 查询分类下的所有文章
+func GetCateArt(id int, pageSize int, pageNum int) ([]Article, int) {
+	var cateArtList []Article //article 的切片
+	err := db.Preload("Category").Limit(pageSize).Offset((pageNum-1)*pageSize).Where(
+		"cid =?", id).Find(&cateArtList).Error
 	if err != nil {
-		return nil
+		return nil, errmsg.ERROR
 	}
-	return cate
+	if len(cateArtList) == 0 {
+		// 没有找到匹配的记录
+		return nil, errmsg.ERROR_CATE_NOT_EXIST
+	}
+	return cateArtList, errmsg.SUCCSE
+}
+
+// GetArtInfo  查询单个文章
+func GetArtInfo(id int) (Article, int) {
+	var article Article
+	err := db.Preload("Category").Where("id = ?", id).First(&article).Error
+	if err != nil {
+		return article, errmsg.ERROR_ART_NOT_EXIST
+	}
+	return article, errmsg.SUCCSE
+
+}
+
+// GetArt 查询文章列表
+func GetArt(pageSize int, pageNum int) ([]Article, int) {
+	var articleList []Article
+	err := db.Preload("Category").Limit(pageSize).Offset((pageNum - 1) * pageSize).Find(&articleList).Error
+	if err != nil {
+		return nil, errmsg.ERROR
+	}
+	return articleList, errmsg.SUCCSE
 }
 
 // EditArt  编辑文章

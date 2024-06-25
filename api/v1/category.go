@@ -78,7 +78,7 @@ func EditCategory(c *gin.Context) {
 	})
 }
 
-// DeleteCategory 删除用户
+// DeleteCategory 删除分类
 func DeleteCategory(c *gin.Context) {
 	id, _ := strconv.Atoi(c.Param("id"))
 

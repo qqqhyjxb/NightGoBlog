@@ -13,6 +13,7 @@ import (
 var (
 	AppMode  string
 	HttpPort string
+	JwtKey   string
 
 	Db         string
 	DbHost     string
@@ -36,6 +37,7 @@ func LoadServer(file *ini.File) {
 	// MustString方法:如果取不到对应的值，就设置为默认值
 	AppMode = file.Section("server").Key("AppMode").MustString("debug")   //如果取不到默认值为debug
 	HttpPort = file.Section("server").Key("HttpPort").MustString(":3000") //如果取不到默认值为3000
+	JwtKey = file.Section("server").Key("JwtKey").MustString("f4da6sf4")
 }
 
 // LoadDatabase 读取Database配置信息
